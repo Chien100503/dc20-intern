@@ -15,20 +15,29 @@ class _MyHomePageState extends State<MyHomePage> {
     return Future.delayed(const Duration(seconds: 2), () => 'Hello');
   }
 
-  onPressed() async {
-    text = await textFunc();
-    setState(() {});
-  } 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Center(child: Text(text)),
-          Center(
-              child: ElevatedButton(onPressed: onPressed, child: Text('Click')))
+          FutureBuilder(
+              future: textFunc(),
+              builder: (context, snapshop) {
+                if (snapshop.connectionState == ConnectionState.waiting) {
+                  return CircularProgressIndicator();
+                }
+                if (snapshop.hasData) {
+                  var value = snapshop.data.toString();
+                  return Text(value);
+                }
+                if (snapshop.hasError) {
+                  print(snapshop.error);
+                }
+
+                return const Text('');
+              })
         ],
       ),
     );
